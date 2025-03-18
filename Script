@@ -1,0 +1,109 @@
+package Website;
+
+import java.time.Duration;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class Sauce_demo {
+
+	public static void main(String[] args) throws InterruptedException {
+		WebDriver driver=new ChromeDriver();
+		driver.get("https://www.saucedemo.com/");
+		//Storing login credentials.
+		WebElement login_name=driver.findElement(By.id("login_credentials"));
+		String login[]={"standard_user","locked_out_user","problem_user","performance_glitch_user","error_user","visual_user"};
+		String password="secret_sauce";
+		// login input value.
+		
+		for(int i=0;i<5;i++) {
+			System.out.println(login[i]);
+			driver.findElement(By.id("user-name")).sendKeys(login[i]);
+			driver.findElement(By.id("password")).sendKeys(password);
+			driver.findElement(By.id("login-button")).click();
+			
+			Thread.sleep(200);
+			//verifying if login happens or error .
+			WebElement errorElement=driver.findElement(By.xpath("//div[@class='error-message-container error']"));
+			if(errorElement.isDisplayed()) {
+				System.out.println("login could not be happen");
+				break;
+			}
+			//pop-up handle.
+			
+			driver.switchTo().alert().accept();
+			String title=driver.findElement(By.xpath("//span[@class='title']")).getText();
+			
+			//validate the Title
+			
+			if(title!="Products") { System.out.println("Title doesnot match");}
+			
+			// sorting element.
+			
+			WebElement sorting= driver.findElement(By.xpath("//select[@class='product_sort_container']"));
+			Select select=new Select(sorting);
+			select.selectByValue("lohi");
+			Thread.sleep(300);
+			
+			//if Sorting is broken.
+			
+			WebDriverWait tocheckalert=new WebDriverWait(driver, Duration.ofMillis(1000));
+			if(tocheckalert.until(ExpectedConditions.alertIsPresent())!=null) {
+				String alerttext=driver.switchTo().alert().getText();
+				System.out.println(alerttext);
+				driver.switchTo().alert().accept();
+			}
+				
+			//verifying sorting element
+			
+			driver.findElement(By.xpath("//div[@class='inventory_list']//div[1]//div[2]//div[2]//div[1]"));
+			
+			//add product to the cart and proceed
+			
+			driver.findElement(By.id("add-to-cart-sauce-labs-onesie")).click();
+			
+			//Waits for the latency.
+			WebElement wait=(WebElement) new WebDriverWait(driver,Duration.ofMillis(1000)).until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("add-to-cart-sauce-labs-bike-light"))));
+			wait.click();
+			driver.findElement(By.id("shopping_cart_container")).click();
+			
+			Thread.sleep(200);
+			
+			//checkout page verify the amount 
+			
+			driver.findElement(By.id("checkout")).click();
+			Thread.sleep(200);
+			
+			//click on the checkout and fill the info and continue.
+			
+			driver.findElement(By.id("first-name")).sendKeys("mike");
+			
+			WebElement lastname=driver.findElement(By.xpath("//input[@id='last-name']"));
+			
+			if(lastname.isEnabled()==false) {System.out.println("Element is not responsive");}
+			
+			else{lastname.sendKeys("kushwaha");}driver.findElement(By.id("postal-code")).sendKeys("401107");
+			
+			driver.findElement(By.id("continue")).click();
+			
+			//verify the prices
+			
+			driver.findElement(By.id("finish"));
+			
+			//print success message
+			
+			System.out.println("Success");
+			driver.quit();
+		}
+		driver.close();
+		
+		System.out.println(login_name);
+
+	}
+
+}
